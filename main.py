@@ -25,7 +25,7 @@ def get_formula(n: int):
 	for i in range(n):
 		disjunction = [(i, j) for j in range(n)]
 		clauses.append(disjunction)
-		
+
 	return constraints, clauses
 
 def main():
@@ -35,6 +35,8 @@ def main():
 		return fst * n + snd + 1 
 
 	constraints, clauses = get_formula(n)
+
+	# заполняем входной файл для sat-solvera
 	input_solver_file = open('input.dimacs', 'w')
 	input_solver_file.write('p cnf ' + str(n * n) + ' ' + str(len(constraints) + len(clauses)) + '\n')
 	for fst, snd in constraints:
@@ -46,8 +48,10 @@ def main():
 		input_solver_file.write(s + '\n')
 	input_solver_file.close()
 
+	# запускаем sat-solver
 	subprocess.run(['minisat', 'input.dimacs', 'solution.txt'])
 
+	# парсим результат работы sat-solvera и выдаём ответ
 	output_solver_file = open('solution.txt', 'r')
 	lines = output_solver_file.readlines()
 	if lines[0] == 'SAT\n':
@@ -56,7 +60,6 @@ def main():
 			print(x, end="")
 			if i % n == n - 1:
 				print()
-	
 	output_solver_file.close()
 	subprocess.run(['rm', 'input.dimacs'])
 	result = subprocess.run(['rm', 'solution.txt'])
